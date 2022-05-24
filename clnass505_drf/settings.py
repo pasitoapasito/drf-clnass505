@@ -10,10 +10,9 @@ For the full list of settings and their values, see
 https://docs.djangoproject.com/en/4.0/ref/settings/
 """
 
-import pymysql, os, json
+import pymysql, os
 
 from pathlib     import Path
-# from my_settings import DATABASES, SECRET_KEY, ALGORITHM
 from dotenv      import load_dotenv, find_dotenv
 
 load_dotenv(find_dotenv())
@@ -22,7 +21,6 @@ load_dotenv(find_dotenv())
 BASE_DIR = Path(__file__).resolve().parent.parent
 
 pymysql.install_as_MySQLdb()
-
 
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/4.0/howto/deployment/checklist/
@@ -34,7 +32,7 @@ ALGORITHM  = os.environ['ALGORITHM']
 APPEND_SLASH = False
 
 ##CORS
-CORS_ORIGIN_ALLOW_ALL  =True
+CORS_ORIGIN_ALLOW_ALL  = True
 CORS_ALLOW_CREDENTIALS = True
     
 CORS_ALLOW_METHODS = (
@@ -61,7 +59,7 @@ CORS_ALLOW_HEADERS = (
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = os.environ['DEBUG']
 
-ALLOWED_HOSTS = os.environ['ALLOWED_HOSTS'],
+ALLOWED_HOSTS = (os.environ['ALLOWED_HOSTS'], )
 
 # Application definition
 
@@ -80,7 +78,10 @@ THIRD_PARTY_APPS = [
 ]
 
 LOCAL_APPS = [
-    
+    'core',
+    'users',
+    'lectures',
+    'reviews',
 ]
 
 INSTALLED_APPS = DEFAULT_APPS + THIRD_PARTY_APPS + LOCAL_APPS
@@ -131,6 +132,7 @@ DATABASES = {
         'PASSWORD': os.environ['RDS_PASSWORD'],
         'HOST': os.environ['RDS_HOSTNAME'],
         'PORT': os.environ['RDS_PORT'],
+        'OPTIONS': {'init_command': "SET sql_mode='STRICT_TRANS_TABLES'"},
     }
 }
 
