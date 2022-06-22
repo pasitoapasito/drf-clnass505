@@ -401,6 +401,4 @@ zsdoc/data
 
 # End of https://www.toptal.com/developers/gitignore/api/python,pycharm,visualstudiocode,linux,macos,vim,zsh
 
-my_settings.py
-
 .env
