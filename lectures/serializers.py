@@ -44,6 +44,9 @@ class LectureDetailSerializer(ModelSerializer):
             'name', 'price', 'discount_rate', 'discount_price', 'description',\
             'difficulty', 'review_avg_rating', 'thumbnail_image_url', 'lecture_images',\
             'reviews'
-        ] 
+        ]
+        extra_kwargs = {
+            'id': {'read_only': True}
+        }
 
 
