@@ -33,9 +33,9 @@ class LectureDetailSerializer(ModelSerializer):
         return calculated_price
 
     def get_review_avg_rating(self, obj):
-        rating = round(obj.review_set.all().aggregate(Avg('rating'))['rating__avg'], 1)\
+        avg_rating = round(obj.review_set.all().aggregate(Avg('rating'))['rating__avg'], 1)\
                  if obj.review_set.all() else None
-        return rating
+        return avg_rating
 
     class Meta:
         model  = Lecture
