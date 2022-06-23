@@ -1,1 +1,1 @@
-## Clnass505 DRF(Django Rest Framework) Project
+## wecode-seconde-project(DRF) : Clnass505
