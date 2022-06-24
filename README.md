@@ -1,1 +1,1 @@
-## wecode-seconde-project(DRF) : Clnass505
+## wecode-seconde-project Django Rest Framework version
