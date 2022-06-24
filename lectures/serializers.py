@@ -7,6 +7,22 @@ from lectures.models            import Lecture, LectureImage
 from reviews.serializers        import ReviewSerializer
 
 
+class LectureListSerializer(ModelSerializer):
+    
+    creator_nickname = serializers.CharField(source='user.name')
+    like_count       = serializers.SerializerMethodField()
+   
+    def get_like_count(self, obj):
+        return obj.likes
+        
+    class Meta:
+        model  = Lecture
+        fields = ['id', 'name', 'price', 'discount_rate', 'thumbnail_image_url', 'creator_nickname', 'like_count']
+        extra_kwargs = {
+            'id': {'read_only': True}
+        }
+
+
 class LectureImageSerializer(ModelSerializer):
     
     class Meta:
@@ -48,5 +64,3 @@ class LectureDetailSerializer(ModelSerializer):
         extra_kwargs = {
             'id': {'read_only': True}
         }
-
-
