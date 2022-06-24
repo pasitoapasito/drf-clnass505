@@ -1,6 +1,5 @@
 from typing          import Any
 
-from lectures.models import Lecture
 from users.models    import UserLecture
 
 
@@ -16,4 +15,3 @@ def get_user_status(lecture, user) -> Any:
         user_status = None
     
     return user_status
-    
