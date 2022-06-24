@@ -8,7 +8,7 @@ from core.utils              import get_user_status
 
 from users.models            import Like
 from lectures.models         import Lecture
-from lectures.serializers    import LectureListSerializer, LectureDetailSerializer
+from lectures.serializers    import LectureSerializer, LectureDetailSerializer
 
 
 class LectureListView(APIView):
@@ -53,11 +53,13 @@ class LectureListView(APIView):
 
             lectures = Lecture.objects\
                               .annotate(likes=Count('like'), star=Avg('review__rating'))\
+                              .select_related('user', 'subcategory')\
+                              .prefetch_related('like_set')\
                               .filter(q)\
                               .order_by(sort_set[sort])[offset : offset+limit]
             
             # TODO user like status
-            serializer = LectureListSerializer(lectures, many=True)
+            serializer = LectureSerializer(lectures, many=True)
             return Response(serializer.data, status=200)
 
         except KeyError:
@@ -115,3 +117,17 @@ class LectureLikeView(APIView):
         
         except Lecture.DoesNotExist as e:
             return Response({'detail' : str(e)}, status=400)
+        
+        
+class LectureCreatorView(APIView):
+    @query_debugger
+    @signin_decorator
+    def get(self, request):
+        user     = request.user
+        lectures = Lecture.objects\
+                          .annotate(likes=Count('like'))\
+                          .select_related('user', 'subcategory')\
+                          .filter(user=user)
+        
+        serializer = LectureSerializer(lectures, many=True)
+        return Response(serializer.data, status=200)
