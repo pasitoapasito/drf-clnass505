@@ -1,1 +1,1 @@
-## wecode-seconde-project Django Rest Framework version
+## wecode-seconde-project Django Rest Framework
