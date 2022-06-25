@@ -5,8 +5,43 @@ from django.db.models           import Avg
 
 from lectures.models            import Lecture, LectureImage
 from reviews.serializers        import ReviewSerializer
+from users.models               import Like
 
 
+class LectureLikeSerializer(ModelSerializer):
+    subcategory               = serializers.CharField(source='lecture.subcategory.name')
+    creator_nickname          = serializers.CharField(source='lecture.user.name')
+    creator_profile_image_url = serializers.CharField(source='lecture.user.profile_image_url')
+    name                      = serializers.CharField(source='lecture.name')
+    price                     = serializers.IntegerField(source='lecture.price')
+    thumbnail_image_url       = serializers.CharField(source='lecture.thumbnail_image_url')
+    discount_rate             = serializers.SerializerMethodField()
+    discount_price            = serializers.SerializerMethodField()
+    like_count                = serializers.SerializerMethodField()
+    
+    def get_discount_rate(self, obj):
+        return obj.lecture.discount_rate if obj.lecture.discount_rate else None
+    
+    def get_discount_price(self, obj):
+        calculated_price = float(obj.lecture.price) * (1-(obj.lecture.discount_rate/100))\
+                           if obj.lecture.discount_rate else None
+        return calculated_price    
+    
+    def get_like_count(self, obj):
+        return obj.lecture.like_set.count()
+    
+    class Meta:
+        model  = Like
+        fields = [
+            'id', 'subcategory', 'creator_nickname', 'creator_profile_image_url',\
+            'name', 'price', 'thumbnail_image_url', 'discount_rate', 'discount_price',\
+            'like_count'
+        ]
+        extra_kwargs = {
+            'id': {'read_only': True}
+        }
+    
+    
 class LectureSerializer(ModelSerializer):
     
     subcategory               = serializers.CharField(source='subcategory.name')
@@ -43,6 +78,9 @@ class LectureImageSerializer(ModelSerializer):
     class Meta:
         model  = LectureImage
         fields = ['id', 'title', 'sequence', 'image_url']
+        extra_kwargs = {
+            'id': {'read_only': True}
+        }
 
 
 class LectureDetailSerializer(ModelSerializer):
