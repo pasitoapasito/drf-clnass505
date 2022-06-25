@@ -1,5 +1,6 @@
 from django.urls    import path
-from lectures.views import LectureListView, LectureDetailView, LectureLikeView, LectureCreatorView
+from lectures.views import LectureListView, LectureDetailView, LectureLikeView,\
+                           LectureCreatorView, LectureStudentView
 
 urlpatterns = [
     path('', LectureListView.as_view()),
@@ -7,5 +8,6 @@ urlpatterns = [
     path('/<int:lecture_id>/like', LectureLikeView.as_view()),
     path('/likes', LectureLikeView.as_view()),
     path('/creator', LectureCreatorView.as_view()),
+    path('/student', LectureStudentView.as_view()),
 ]
 

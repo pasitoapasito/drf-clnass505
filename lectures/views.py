@@ -71,8 +71,7 @@ class LectureDetailView(APIView):
     @public_decorator
     def get(self, request, lecture_id):
         try:
-            user = request.user
-            
+            user    = request.user
             lecture = Lecture.objects\
                             .select_related('user', 'subcategory')\
                             .prefetch_related('lectureimage_set', 'review_set', 'like_set')\
@@ -143,3 +142,17 @@ class LectureCreatorView(APIView):
         
         serializer = LectureSerializer(lectures, many=True)
         return Response(serializer.data, status=200)
+    
+
+class LectureStudentView(APIView):
+    @query_debugger
+    @signin_decorator
+    def get(self, request):
+        user     = request.user
+        lectures = user.lectures\
+                       .select_related('subcategory', 'user')\
+                       .prefetch_related('like_set')\
+                       .all()
+                       
+        serializer = LectureSerializer(lectures, many=True)
+        return Response(serializer.data, status=200)      
