@@ -8,7 +8,7 @@ from core.utils              import get_user_status
 
 from users.models            import Like
 from lectures.models         import Lecture
-from lectures.serializers    import LectureSerializer, LectureDetailSerializer
+from lectures.serializers    import LectureSerializer, LectureDetailSerializer, LectureLikeSerializer
 
 
 class LectureListView(APIView):
@@ -102,6 +102,18 @@ class LectureDetailView(APIView):
 
 
 class LectureLikeView(APIView):
+    @query_debugger
+    @signin_decorator
+    def get(self, request):
+        user  = request.user
+        likes = Like.objects\
+                    .select_related('lecture__user', 'lecture__subcategory')\
+                    .filter(user=user)
+        
+        serializer = LectureLikeSerializer(likes, many=True)
+        return Response(serializer.data, status=200)
+    
+    
     @signin_decorator
     def post(self, request, lecture_id):
         try:
