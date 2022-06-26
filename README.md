@@ -1,1 +1,1 @@
-## wecode-seconde-project Django Rest Framework
+## DRF Practice : wecode-second-project
