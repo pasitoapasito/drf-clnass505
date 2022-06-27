@@ -2,10 +2,100 @@ from rest_framework             import serializers
 from rest_framework.serializers import ModelSerializer
 
 from django.db.models           import Avg
+from django.db                  import transaction
 
-from lectures.models            import Lecture, LectureImage
+from lectures.models            import Lecture, LectureImage, Difficulty, Subcategory
 from reviews.serializers        import ReviewSerializer
-from users.models               import Like
+from users.models               import User, Like
+
+'''
+from core.storage               import FileUpload, s3_client
+
+from clnass505_drf.settings     import (
+    BUCKET_DIR_THUMBNAIL,
+    BUCKET_DIR_IMAGE,
+    BUCKET_DIR_PROFILE 
+)
+'''
+
+'''
+class LectureCreateSerializer(ModelSerializer):
+    
+    @transaction.atomic()
+    def create(self, validated_data):
+        file_handler = FileUpload(s3_client)
+        
+        users = validated_data.pop('users')
+        
+        for user_info in users:
+            user_id = user_info.get('id')
+            profile = user_info.get('profile_image_url')
+            try:
+                user = User.objects.get(id=user_id)
+            except User.DoesNotExist:
+                raise serializers.ValidationError(f'user id {user_id} does not exists')
+            uploaded_profile_image_url = file_handler.upload(profile, BUCKET_DIR_PROFILE)
+            user.profile_image_url     = uploaded_profile_image_url
+            user.save()
+        
+        name           = validated_data.pop('name')
+        price          = validated_data.pop('price')
+        thumbnail      = validated_data.pop('thumbnail_image_url')
+        discount_rate  = validated_data.pop('discount_rate')
+        difficulty_id  = validated_data.pop('difficulty')
+        subcategory_id = validated_data.pop('subcategory')
+        description    = validated_data.pop('description')
+        
+        try:
+            difficulty = Difficulty.objects.get(id=difficulty_id)
+        except Difficulty.DoesNotExist:
+            raise serializers.ValidationError(f'difficulty id {difficulty_id} does not exists')
+        try:
+            subcategory = Subcategory.objects.get(id=subcategory_id)
+        except Subcategory.DoesNotExist:
+            raise serializers.ValidationError(f'subcategory id {subcategory_id} does not exists')
+
+        uploaded_thumbnail_url = file_handler.upload(thumbnail, BUCKET_DIR_THUMBNAIL)
+        lecture = Lecture.obejcts.create(
+            name                = name,
+            price               = price,
+            user_id             = user_id,
+            discount_rate       = discount_rate,
+            thumbnail_image_url = uploaded_thumbnail_url,
+            description         = description,
+            difficulty_id       = difficulty,
+            subcategory_id      = subcategory
+        )
+        
+        lecture_images = validated_data.pop('lectureimage_set')
+        
+        for idx, lecture_image_info in enumerate(lecture_images):
+            title         = lecture_image_info.get('title')
+            lecture_image = lecture_image_info.get('lecture_image')
+            
+            uploaded_lecture_image_url = file_handler.upload(lecture_image, BUCKET_DIR_IMAGE)
+            
+            LectureImage.objects.create(
+                title      = title,
+                image_url  = uploaded_lecture_image_url,
+                sequence   = idx + 1,
+                lecture_id = lecture.id
+            )
+        
+        return lecture
+    
+    class Meta:
+        model  = Lecture
+        fields = [
+            'id', 'users', 'name', 'price', 'thumbnail_image_url',\
+            'discount_rate', 'difficulty', 'subcategory', 'description',\
+            'lectureimage_set'
+        ]
+        extra_kwargs = {
+            'id': {'read_only': True}
+        }
+
+'''
 
 
 class LectureLikeSerializer(ModelSerializer):
