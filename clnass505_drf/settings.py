@@ -73,6 +73,7 @@ DEFAULT_APPS = [
 ]
 
 THIRD_PARTY_APPS = [
+    'drf_yasg',
     'corsheaders',
     'rest_framework',
     'django_extensions',
@@ -172,7 +173,9 @@ USE_TZ = True
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/4.0/howto/static-files/
 
-STATIC_URL = 'static/'
+STATIC_URL = '/static/'
+
+STATIC_ROOT = os.path.join(BASE_DIR, 'static')
 
 # Default primary key field type
 # https://docs.djangoproject.com/en/4.0/ref/settings/#default-auto-field
@@ -198,3 +201,14 @@ BUCKET_ADDRESS          = os.environ['BUCKET_ADDRESS']
 BUCKET_DIR_THUMBNAIL    = os.environ['BUCKET_DIR_THUMBNAIL']
 BUCKET_DIR_IMAGE        = os.environ['BUCKET_DIR_IMAGE']
 BUCKET_DIR_PROFILE      = os.environ['BUCKET_DIR_PROFILE']
+
+### Swagger ###
+SWAGGER_SETTINGS = {
+   'SECURITY_DEFINITIONS': {
+      'Bearer': {
+            'type': 'apiKey',
+            'name': 'Authorization',
+            'in'  : 'header'
+      }
+   }
+}
