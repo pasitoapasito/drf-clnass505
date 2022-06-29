@@ -1,6 +1,9 @@
 from rest_framework.response import Response
 from rest_framework.views    import APIView
 
+from drf_yasg.utils          import swagger_auto_schema
+from drf_yasg                import openapi
+
 from django.db.models        import Q, Avg, Count
 from django.db               import transaction
 
@@ -24,6 +27,7 @@ from clnass505_drf.settings  import (
 class LectureCreatorView(APIView):
     @query_debugger
     @signin_decorator
+    @swagger_auto_schema(responses={200: LectureSerializer})
     def get(self, request):
         user     = request.user
         lectures = Lecture.objects\
@@ -35,6 +39,7 @@ class LectureCreatorView(APIView):
         return Response(serializer.data, status=200)
     
     @signin_decorator
+    @swagger_auto_schema(responses={201: 'new lecture creation success'})
     def post(self, request):
         try:
             user = request.user
@@ -110,8 +115,17 @@ class LectureCreatorView(APIView):
     
 
 class LectureListView(APIView):
+    sort           = openapi.Parameter('sort', openapi.IN_QUERY, required=False, pattern="?sort=", type=openapi.TYPE_STRING)
+    category_id    = openapi.Parameter('category_id', openapi.IN_QUERY, required=False, pattern="?category_id=", type=openapi.TYPE_STRING)
+    subcategory_id = openapi.Parameter('subcategory_id', openapi.IN_QUERY, required=False, pattern="?subcategory_id=", type=openapi.TYPE_STRING)
+    difficulty_id  = openapi.Parameter('difficulty_id', openapi.IN_QUERY, required=False, pattern="?difficulty_id=", type=openapi.TYPE_STRING)
+    search         = openapi.Parameter('search', openapi.IN_QUERY, required=False, pattern="?search=", type=openapi.TYPE_STRING)
+    offset         = openapi.Parameter('offset', openapi.IN_QUERY, required=False, pattern="?offset=", type=openapi.TYPE_STRING)
+    limit          = openapi.Parameter('limit', openapi.IN_QUERY, required=False, pattern="?limit=", type=openapi.TYPE_STRING)
+    
     @query_debugger
     @public_decorator
+    @swagger_auto_schema(responses={200: LectureSerializer}, manual_parameters=[sort, category_id, subcategory_id, difficulty_id, search, offset, limit])
     def get(self, request):
         try:
             user = request.user
@@ -167,6 +181,7 @@ class LectureListView(APIView):
 class LectureDetailView(APIView):
     @query_debugger
     @public_decorator
+    @swagger_auto_schema(responses={200: 'success'})
     def get(self, request, lecture_id):
         try:
             user    = request.user
@@ -201,6 +216,7 @@ class LectureDetailView(APIView):
 class LectureLikeView(APIView):
     @query_debugger
     @signin_decorator
+    @swagger_auto_schema(responses={200: LectureLikeSerializer})
     def get(self, request):
         user  = request.user
         likes = Like.objects\
@@ -230,6 +246,7 @@ class LectureLikeView(APIView):
 class LectureStudentView(APIView):
     @query_debugger
     @signin_decorator
+    @swagger_auto_schema(responses={200: LectureSerializer})
     def get(self, request):
         user     = request.user
         lectures = user.lectures\
