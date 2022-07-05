@@ -1,1 +1,1 @@
-## DRF Practice : wecode-second-project
+## wecode-second-project DRF Practice
