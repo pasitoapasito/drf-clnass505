@@ -25,18 +25,12 @@ class LectureCreateSerializer(ModelSerializer):
     def create(self, validated_data):
         file_handler = FileUpload(s3_client)
         
-        users = validated_data.pop('users')
+        user    = validated_data.pop('user')
+        profile = validated_data.pop('profile_image_url')
         
-        for user_info in users:
-            user_id = user_info.get('id')
-            profile = user_info.get('profile_image_url')
-            try:
-                user = User.objects.get(id=user_id)
-            except User.DoesNotExist:
-                raise serializers.ValidationError(f'user id {user_id} does not exists')
-            uploaded_profile_image_url = file_handler.upload(profile, BUCKET_DIR_PROFILE)
-            user.profile_image_url     = uploaded_profile_image_url
-            user.save()
+        uploaded_profile_image_url = file_handler.upload(profile, BUCKET_DIR_PROFILE)
+        user.profile_image_url     = uploaded_profile_image_url
+        user.save
         
         name           = validated_data.pop('name')
         price          = validated_data.pop('price')
@@ -59,42 +53,42 @@ class LectureCreateSerializer(ModelSerializer):
         lecture = Lecture.obejcts.create(
             name                = name,
             price               = price,
-            user_id             = user_id,
+            user_id             = user.id,
             discount_rate       = discount_rate,
             thumbnail_image_url = uploaded_thumbnail_url,
             description         = description,
-            difficulty_id       = difficulty,
-            subcategory_id      = subcategory
+            difficulty          = difficulty,
+            subcategory         = subcategory
         )
         
-        lecture_images = validated_data.pop('lectureimage_set')
+        bulk_lecture_images = []
         
-        for idx, lecture_image_info in enumerate(lecture_images):
-            title         = lecture_image_info.get('title')
-            lecture_image = lecture_image_info.get('lecture_image')
-            
+        lecture_images = validated_data.pop('lecture_images_url')
+        title          = validated_data.pop('title')
+        
+        for idx, lecture_image in enumerate(lecture_images):
             uploaded_lecture_image_url = file_handler.upload(lecture_image, BUCKET_DIR_IMAGE)
             
-            LectureImage.objects.create(
-                title      = title,
-                image_url  = uploaded_lecture_image_url,
-                sequence   = idx + 1,
-                lecture_id = lecture.id
-            )
+            bulk_lecture_images.append(
+                LectureImage(
+                    title      = title,
+                    image_url  = uploaded_lecture_image_url,
+                    sequence   = idx + 1,
+                    lecture_id = lecture.id
+                    )
+                )
         
         return lecture
     
     class Meta:
         model  = Lecture
         fields = [
-            'id', 'users', 'name', 'price', 'thumbnail_image_url',\
-            'discount_rate', 'difficulty', 'subcategory', 'description',\
-            'lectureimage_set'
+            'id', 'user', 'name', 'price', 'discount_rate', 'difficulty',\
+            'subcategory', 'description', 'thumbnail_image_url'
         ]
         extra_kwargs = {
             'id': {'read_only': True}
         }
-
 '''
 
 
@@ -140,6 +134,7 @@ class LectureSerializer(ModelSerializer):
     like_count                = serializers.SerializerMethodField()
     discount_rate             = serializers.SerializerMethodField()
     discount_price            = serializers.SerializerMethodField()
+    user_like_status          = serializers.SerializerMethodField()
    
     def get_like_count(self, obj):
         return obj.likes
@@ -152,11 +147,18 @@ class LectureSerializer(ModelSerializer):
                            if obj.discount_rate else None
         return calculated_price
     
+    def get_user_like_status(self, obj):
+        user    = self.context.get('user', None)
+        lecture = obj
+        if user:
+            return Like.objects.filter(user=user, lecture=lecture).exists()
+        return False
+    
     class Meta:
         model  = Lecture
         fields = [
             'id', 'name', 'price', 'discount_rate', 'thumbnail_image_url', 'creator_nickname',\
-            'like_count', 'creator_profile_image_url', 'subcategory', 'discount_price'
+            'like_count', 'creator_profile_image_url', 'subcategory', 'discount_price', 'user_like_status'
         ]
         extra_kwargs = {
             'id': {'read_only': True}

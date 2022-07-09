@@ -1,3 +1,4 @@
+from multiprocessing import context
 from rest_framework.response import Response
 from rest_framework.views    import APIView
 
@@ -105,12 +106,15 @@ class LectureCreatorView(APIView):
         
     '''
     def post(self, request):
+        user = request.user
+        
         serializer = LectureCreateSerializer(data=request.data)
+        print(serializer)
         if serializer.is_valid():
             print(serializer.validated_data)
-            serializer.save()
+            serializer.save(user=user)
             return Response(serializer.data, status=201)
-        return Response(serializer.error, status=400)
+        return Response(serializer.errors, status=400)
     '''
     
 
@@ -170,8 +174,7 @@ class LectureListView(APIView):
                               .filter(q)\
                               .order_by(sort_set[sort])[offset : offset+limit]
             
-            # TODO user like status
-            serializer = LectureSerializer(lectures, many=True)
+            serializer = LectureSerializer(lectures, many=True, context={'user' : user})
             return Response(serializer.data, status=200)
 
         except KeyError:
