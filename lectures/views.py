@@ -1,4 +1,3 @@
-from multiprocessing import context
 from rest_framework.response import Response
 from rest_framework.views    import APIView
 
@@ -105,6 +104,8 @@ class LectureCreatorView(APIView):
             return Response({'detail' : str(t)}, status=400)
         
     '''
+    > TODO: 강의 생성기능 DRF적용
+    
     def post(self, request):
         user = request.user
         
