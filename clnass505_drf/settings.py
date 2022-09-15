@@ -126,6 +126,8 @@ WSGI_APPLICATION = 'clnass505_drf.wsgi.application'
 
 # DATABASES = DATABASES
 
+
+## AWS RDS ##
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.mysql',
@@ -137,6 +139,20 @@ DATABASES = {
         'OPTIONS': {'init_command': "SET sql_mode='STRICT_TRANS_TABLES'"},
     }
 }
+
+## DOCKER DB ##
+'''
+DATABASES = {
+    'default': {
+        'ENGINE': 'django.db.backends.mysql',
+        'NAME': os.environ['MYSQL_DATABASE'],
+        'USER': 'root',
+        'PASSWORD': os.environ['MYSQL_ROOT_PASSWORD'],
+        'HOST': 'db',
+        'PORT': os.environ['MYSQL_TCP_PORT'],
+    }
+}
+'''
 
 
 # Password validation
@@ -167,7 +183,7 @@ TIME_ZONE = 'Asia/Seoul'
 
 USE_I18N = True
 
-USE_TZ = True
+USE_TZ = False
 
 
 # Static files (CSS, JavaScript, Images)
