@@ -13,7 +13,6 @@ from core.utils              import get_user_status
 from users.models            import Like
 from lectures.models         import Lecture, LectureImage, Difficulty, Subcategory
 from lectures.serializers    import LectureSerializer, LectureDetailSerializer, LectureLikeSerializer
-                                    # LectureCreateSerializer
 
 from core.storage            import FileUpload, s3_client
 
@@ -103,21 +102,6 @@ class LectureCreatorView(APIView):
         except transaction.TransactionManagementError as t:
             return Response({'detail' : str(t)}, status=400)
         
-    '''
-    > TODO: 강의 생성기능 DRF적용
-    
-    def post(self, request):
-        user = request.user
-        
-        serializer = LectureCreateSerializer(data=request.data)
-        print(serializer)
-        if serializer.is_valid():
-            print(serializer.validated_data)
-            serializer.save(user=user)
-            return Response(serializer.data, status=201)
-        return Response(serializer.errors, status=400)
-    '''
-    
 
 class LectureListView(APIView):
     sort           = openapi.Parameter('sort', openapi.IN_QUERY, required=False, pattern="?sort=", type=openapi.TYPE_STRING)
