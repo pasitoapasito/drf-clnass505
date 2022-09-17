@@ -18,7 +18,7 @@ services:
         gunicorn clnass505_drf.wsgi:application --bind 0.0.0.0:8000
     stdin_open: true
     volumes:
-      - .:/var/www/payhere
+      - .:/var/www/clnass505
     ports:
       - "8000:8000"
     depends_on:
